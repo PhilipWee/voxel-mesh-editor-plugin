@@ -8,7 +8,7 @@ var current_value = []
 # A guard against internal changes when the property is updated.
 var updating = false
 
-var chunk_size = 0
+var chunk_size = 16 #Change this if necessary
 var cube_width = 1
 var origin = Vector3(0,0,0)
 var min_dist_between_ray_hits
@@ -89,7 +89,7 @@ func _on_button_pressed():
 	current_value = get_point_arr()
 	property_control.text = "Generate Array"
 	#The plus one is so that the chunk size is by number of cubes, not number of points
-	chunk_size = get_edited_object().chunk_size + 1 
+#	chunk_size = get_edited_object().get_chunk_size() + 1 
 	cube_width = get_edited_object().cube_width
 	min_dist_between_ray_hits = cube_width/4
 	origin = Vector3(0,0,0) #TODO make dependent on mesh starting location

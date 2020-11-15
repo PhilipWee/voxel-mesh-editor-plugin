@@ -1,7 +1,7 @@
 # MyInspectorPlugin.gd
 extends EditorInspectorPlugin
 
-var RandomIntEditor = preload("res://addons/vox_mesh_editor_extension/RandomIntEditor.gd")
+var VoxMeshPropertyEditor = preload("res://addons/vox_mesh_editor_extension/vox_mesh_property_editor.gd")
 
 
 func can_handle(object):
@@ -14,7 +14,7 @@ func parse_property(object, type, path, hint, hint_text, usage):
 	if type == TYPE_ARRAY:
 		# Create an instance of the custom property editor and register
 		# it to a specific property path.
-		add_property_editor(path, RandomIntEditor.new())
+		add_property_editor(path, VoxMeshPropertyEditor.new())
 		# Inform the editor to remove the default property editor for
 		# this property type.
 		return true

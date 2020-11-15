@@ -5,7 +5,7 @@ var plugin
 
 
 func _enter_tree():
-	plugin = preload("res://addons/vox_mesh_editor_extension/MyInspectorPlugin.gd").new()
+	plugin = preload("res://addons/vox_mesh_editor_extension/vox_mesh_inspector_plugin.gd").new()
 	add_inspector_plugin(plugin)
 
 
