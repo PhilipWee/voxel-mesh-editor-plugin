@@ -31,7 +31,7 @@ func raycast_get_hits(initial_pos,dir,space_state):
 	#Do the casting for one
 	while !(result.empty() and !cast_forward):
 		if cast_forward:
-			result = space_state.intersect_ray(result['position'],result['position'] + dir*1e5)
+			result = space_state.intersect_ray(result['position'],result['position'] + dir*1e5,[],pow(2,20-1))
 			if result.empty():
 				#No more hits in forward direction
 				result = {'position':initial_pos + dir*1e5}
@@ -42,7 +42,7 @@ func raycast_get_hits(initial_pos,dir,space_state):
 				result['position'] += dir*min_dist_between_ray_hits
 				continue
 		else:
-			result = space_state.intersect_ray(result['position'],initial_pos)
+			result = space_state.intersect_ray(result['position'],initial_pos,[],pow(2,20-1))
 			if result.empty():
 				#No more hits in backward direction
 				break
@@ -93,6 +93,7 @@ func _on_button_pressed():
 	cube_width = get_edited_object().cube_width
 	min_dist_between_ray_hits = cube_width/4
 	origin = Vector3(0,0,0) #TODO make dependent on mesh starting location
+	print("Note that mesh is generated from collisions on layer 20")
 	print("Point Array Retrieved:" + str(current_value).substr(0,200))
 	emit_changed(get_edited_property(), current_value)
 
