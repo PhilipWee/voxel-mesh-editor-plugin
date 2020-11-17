@@ -8,9 +8,20 @@
 
 config_version=4
 
-_global_script_classes=[  ]
+_global_script_classes=[ {
+"base": "Spatial",
+"class": "VoxMeshHandler",
+"language": "GDScript",
+"path": "res://addons/VoxMeshEditorExtension/VoxMeshHandler.gd"
+}, {
+"base": "MeshInstance",
+"class": "VoxMeshInstance",
+"language": "GDScript",
+"path": "res://addons/VoxMeshEditorExtension/VoxMeshInstance.gd"
+} ]
 _global_script_class_icons={
-
+"VoxMeshHandler": "",
+"VoxMeshInstance": ""
 }
 
 [application]
@@ -20,7 +31,7 @@ config/icon="res://icon.png"
 
 [editor_plugins]
 
-enabled=PoolStringArray( "vox_mesh_editor_extension" )
+enabled=PoolStringArray( "VoxMeshEditorExtension" )
 
 [rendering]
 
