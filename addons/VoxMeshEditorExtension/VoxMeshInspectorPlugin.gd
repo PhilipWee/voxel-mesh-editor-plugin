@@ -23,7 +23,7 @@ func parse_property(object, type, path, hint, hint_text, usage):
 		# Inform the editor to remove the default property editor for
 		# this property type.
 		return true
-	elif type == TYPE_INT and path == 'generate_children':
+	elif type == TYPE_INT and path == 'execute_func':
 		add_property_editor(path, VoxMeshHandlerPropertyEditor.new())
 		return true
 	else:

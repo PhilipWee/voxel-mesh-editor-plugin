@@ -4,8 +4,14 @@ class_name VoxMeshHandler
 
 export(float) var cube_width = 1
 export(Vector3) var chunk_dimensions = Vector3(256,256,128)
-export(int) var generate_children
+export(int) var execute_func
 export(int) var chunk_size = 16
+
+enum FUNC_OPTIONS {GENERATE_CHILDREN,TEST_RAYCAST,GENERATE_CHILDREN_CONCAVE}
+export (FUNC_OPTIONS) var func_option
+
+export(Vector3) var test_ray_from
+export(Vector3) var test_ray_to
 # Declare member variables here. Examples:
 # var a = 2
 # var b = "text"

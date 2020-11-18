@@ -33,6 +33,10 @@ config/icon="res://icon.png"
 
 enabled=PoolStringArray( "VoxMeshEditorExtension" )
 
+[physics]
+
+3d/physics_engine="Bullet"
+
 [rendering]
 
 environment/default_environment="res://default_env.tres"
