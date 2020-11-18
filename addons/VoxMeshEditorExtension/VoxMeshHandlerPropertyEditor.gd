@@ -123,7 +123,6 @@ func get_point_arr(origin = Vector3(0,0,0), chunk_size = 16):
 	
 	#Change value from number of points to chunksize
 	chunk_size += 1
-	print(space_state)
 
 	state_arr.resize(pow(chunk_size,3))
 	var i
@@ -187,13 +186,14 @@ func get_point_arr(origin = Vector3(0,0,0), chunk_size = 16):
 							else:
 								otherval = clamp((-0.5+distance_proportion)/distance_proportion,-9999999,0.5)
 							#Set the other value
-							if i_iterator+augment.x > chunk_size or i_iterator+augment.x < 0:
+							if i_iterator+augment.x > chunk_size-1 or i_iterator+augment.x < 0:
 								continue
-							if j_iterator+augment.y > chunk_size or j_iterator+augment.y < 0:
+							if j_iterator+augment.y > chunk_size-1 or j_iterator+augment.y < 0:
 								continue
-							if k_iterator+augment.z > chunk_size or k_iterator+augment.z < 0:
+							if k_iterator+augment.z > chunk_size-1 or k_iterator+augment.z < 0:
 								continue
 							var other_arr_index = (i_iterator+augment.x)*chunk_size*chunk_size + (j_iterator+augment.y)*chunk_size + (k_iterator+augment.z)
+								
 							state_arr[other_arr_index] = otherval
 
 	spatial.free()
@@ -202,7 +202,7 @@ func get_point_arr(origin = Vector3(0,0,0), chunk_size = 16):
 
 func generate_children():
 	var chunk_dimensions = get_edited_object().chunk_dimensions
-	var chunk_size = VoxMeshHandler.new().chunk_size #Change this if necessary
+	var chunk_size = get_edited_object().chunk_size
 	var chunks_per_axis = chunk_dimensions/chunk_size
 	chunks_per_axis = Vector3(ceil(chunks_per_axis.x),ceil(chunks_per_axis.y),ceil(chunks_per_axis.z))
 	var cube_width = get_edited_object().cube_width
@@ -216,6 +216,10 @@ func generate_children():
 	for child in vox_mesh_handler.get_children():
 		child.name = 'to_be_queued_free'
 		child.queue_free()
+		
+	#For progress indication
+	var total_iterations = chunks_per_axis.x*chunks_per_axis.y*chunks_per_axis.z
+	var cur_iteration = 0
 	
 	for i_iterator in range(chunks_per_axis.x):
 		i = origin.x + i_iterator*chunk_size*cube_width
@@ -250,6 +254,9 @@ func generate_children():
 				new_static_body.name = str(i_iterator,'-',j_iterator,'-',k_iterator)
 				#Update the collision shape
 				new_vox_mesh_instance.update_collision_shape()
+				
+				cur_iteration += 1
+				print(cur_iteration, "/", total_iterations, " completed")
 	return 0
 	
 func test_raycast():
