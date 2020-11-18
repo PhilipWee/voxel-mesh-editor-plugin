@@ -7,6 +7,8 @@ export(Vector3) var chunk_dimensions = Vector3(256,256,128)
 export(int) var execute_func
 export(int) var chunk_size = 16
 
+export(ShaderMaterial) var voxel_mesh_material
+
 enum FUNC_OPTIONS {GENERATE_CHILDREN,TEST_RAYCAST,GENERATE_CHILDREN_CONCAVE}
 export (FUNC_OPTIONS) var func_option
 

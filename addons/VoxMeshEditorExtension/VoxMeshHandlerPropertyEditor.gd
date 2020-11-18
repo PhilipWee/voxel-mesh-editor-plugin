@@ -241,6 +241,10 @@ func generate_children():
 				new_vox_mesh_instance.set_owner(get_tree().get_edited_scene_root())
 				new_static_body.set_owner(get_tree().get_edited_scene_root())
 				new_col_shape.set_owner(get_tree().get_edited_scene_root())
+				#Set the material of the mesh instance
+				if get_edited_object().voxel_mesh_material:
+					new_vox_mesh_instance.set_surface_material(0,get_edited_object().voxel_mesh_material)
+				
 				#Set the location and name appropriately
 				new_static_body.global_transform.origin = new_origin
 				new_static_body.name = str(i_iterator,'-',j_iterator,'-',k_iterator)

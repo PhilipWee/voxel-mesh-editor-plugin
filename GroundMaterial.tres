@@ -1,0 +1,59 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=2]
+
+[sub_resource type="Shader" id=1]
+code = "shader_type spatial;
+
+varying vec3 power_normal;
+varying vec3 world_normal;
+varying vec3 object_normal;
+varying vec3 triplanar_pos;
+
+uniform vec4 earth: hint_color;
+uniform vec4 grass: hint_color;
+
+uniform sampler2D topTexture;
+uniform sampler2D sideTexture;
+
+void vertex() {
+	world_normal = vec3(0,1.0,0);
+	object_normal = NORMAL;
+	
+	power_normal = pow(abs(NORMAL),vec3(10.0));
+	power_normal = normalize(power_normal);
+	
+	triplanar_pos = VERTEX.xyz * vec3(1.0,-1.0,1.0);
+}
+
+vec4 triplanar_texture(sampler2D p_sampler, vec3 p_weights, vec3 p_triplanar_pos) {
+	vec4 samp = vec4(0.0);
+	samp += texture(p_sampler, p_triplanar_pos.xy) * p_weights.z;
+	samp += texture(p_sampler, p_triplanar_pos.xz) * p_weights.y;
+	samp += texture(p_sampler, p_triplanar_pos.zy * vec2(-1.0,1.0)) * p_weights.x;
+	return samp;
+}
+
+
+uniform float heightScaling = 0.1;
+uniform float grassScaling = 2.0;
+
+
+void fragment() {
+	//EARTH
+	vec4 side_tex = triplanar_texture(sideTexture, power_normal,triplanar_pos*vec3(.1,heightScaling,.1));
+	ALBEDO = side_tex.rgb * earth.rgb;
+	
+	//GRASS
+	vec4 grass_tex = triplanar_texture(topTexture, power_normal,triplanar_pos);
+	float mix_value = dot(object_normal, world_normal) * grassScaling;
+	mix_value = clamp(mix_value, 0.0, 1);
+	ALBEDO.r = mix(ALBEDO.r, grass_tex.r * grass.r, mix_value);
+	ALBEDO.g = mix(ALBEDO.g, grass_tex.g * grass.g, mix_value);
+	ALBEDO.b = mix(ALBEDO.b, grass_tex.b * grass.b, mix_value);
+}"
+
+[resource]
+shader = SubResource( 1 )
+shader_param/earth = Color( 0.560784, 0.478431, 0.478431, 1 )
+shader_param/grass = Color( 0.917647, 0.670588, 0.0823529, 1 )
+shader_param/heightScaling = 200.0
+shader_param/grassScaling = 1.361
