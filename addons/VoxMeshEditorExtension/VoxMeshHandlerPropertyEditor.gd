@@ -123,6 +123,9 @@ func get_point_arr(origin = Vector3(0,0,0), chunk_size = 16):
 	
 	#Change value from number of points to chunksize
 	chunk_size += 1
+	
+	#Already hit dictionary
+	var alr_hit_dict = {}
 
 	state_arr.resize(pow(chunk_size,3))
 	var i
@@ -151,7 +154,7 @@ func get_point_arr(origin = Vector3(0,0,0), chunk_size = 16):
 
 				if hits.size() % 2 == 0:
 					#Outside mesh
-					state_arr[cur_arr_index] = -9999999
+					state_arr[cur_arr_index] = 0
 				else:
 					#Inside mesh
 
@@ -177,14 +180,37 @@ func get_point_arr(origin = Vector3(0,0,0), chunk_size = 16):
 #						print(one_unit_hit)
 
 						if !one_unit_hit.empty():
-							#Get the distance away of the hit
-							var distance_away = one_unit_hit.position.distance_to(Vector3(i,j,k))
-							var distance_proportion = clamp(distance_away/cube_width,0,1)
-							var otherval
-							if distance_proportion == 0:
-								otherval = -9999999
+#							print('hit detected')
+							#Get the average distance away of the hit
+							var avg_dist_away = 0
+							var num_hits = 0
+							var other_pt_location = Vector3(i+augment.x*cube_width,j+augment.y*cube_width,k+augment.z*cube_width)
+							for other_pt_augment in possible_augments:
+								var other_from_location = Vector3(other_pt_location.x+other_pt_augment.x*cube_width*1.01,
+																	other_pt_location.y+other_pt_augment.y*cube_width*1.01,
+																	other_pt_location.z+other_pt_augment.z*cube_width*1.01)
+								var other_one_unit_hit = space_state.intersect_ray(other_pt_location,other_from_location,[],MAP_COLLIDER_LAYER)
+								if !other_one_unit_hit.empty():
+									num_hits += 1
+									avg_dist_away += other_one_unit_hit.position.distance_to(other_pt_location)
+#								print("Other from:",other_from_location)
+#								print("Other pt:",other_pt_location)
+							if num_hits == 0:
+								#The collision is at the point itself
+								avg_dist_away = 0.99
+								print('hi')
 							else:
-								otherval = clamp((-0.5+distance_proportion)/distance_proportion,-9999999,0.5)
+								avg_dist_away = 1-avg_dist_away/num_hits
+								
+								
+							var distance_proportion = clamp(avg_dist_away/cube_width,0,0.999) #To ensure next point is not outside mesh
+
+							
+							
+#							if distance_proportion == 0:
+#								otherval = 0
+#							else:
+#								otherval = clamp((-0.5+distance_proportion)/distance_proportion,0,0.5)
 							#Set the other value
 							if i_iterator+augment.x > chunk_size-1 or i_iterator+augment.x < 0:
 								continue
@@ -194,10 +220,10 @@ func get_point_arr(origin = Vector3(0,0,0), chunk_size = 16):
 								continue
 							var other_arr_index = (i_iterator+augment.x)*chunk_size*chunk_size + (j_iterator+augment.y)*chunk_size + (k_iterator+augment.z)
 								
-							state_arr[other_arr_index] = otherval
+							state_arr[other_arr_index] = distance_proportion
 
 	spatial.free()
-	print("Point Array Generated: " + str(state_arr).substr(0,300))
+	print("Point Array Generated: " + str(state_arr).substr(0,1000))
 	return state_arr
 
 func generate_children():
@@ -216,7 +242,7 @@ func generate_children():
 	for child in vox_mesh_handler.get_children():
 		child.name = 'to_be_queued_free'
 		child.queue_free()
-		
+	
 	#For progress indication
 	var total_iterations = chunks_per_axis.x*chunks_per_axis.y*chunks_per_axis.z
 	var cur_iteration = 0
@@ -270,6 +296,50 @@ func test_raycast():
 	spatial.free()
 
 
+func check_magnitude():
+	print("Warning: Function incomplete, may not work as expected")
+	#get the node in question
+	var child_static_body = get_edited_object().get_node(get_edited_object().mag_check_child_node_name)
+	#Change value from number of points to chunksize
+	var chunk_size = get_edited_object().chunk_size
+	chunk_size += 1
+	#Get the array index required
+	var point_coords = get_edited_object().mag_check_location
+	var arr_index_required = point_coords.x*chunk_size*chunk_size + point_coords.y*chunk_size + point_coords.z
+	print("Magnitude for static body ",get_edited_object().mag_check_child_node_name," at coords ",point_coords)
+	print(child_static_body.get_node('MeshInstance').mesh.scalar_field[arr_index_required])
+	
+	var spatial = Spatial.new()
+	get_tree().get_edited_scene_root().add_child(spatial)
+	spatial.set_owner(get_tree().get_edited_scene_root())
+	
+	
+	
+	var total_iterations = pow(chunk_size,3)
+	var cur_iter = 0
+	#Add sphere for magnitude at each point
+	for i in range(chunk_size):
+		for j in range(chunk_size):
+			for k in range(chunk_size):
+				cur_iter += 1
+				var index_to_plot = i*chunk_size*chunk_size + j*chunk_size + k
+				var scalar_field_val = child_static_body.get_node('MeshInstance').mesh.scalar_field[index_to_plot]
+				if scalar_field_val == 0:
+					continue
+				
+				var mag_sphere = MeshInstance.new()
+				spatial.add_child(mag_sphere)
+				mag_sphere.set_owner(get_tree().get_edited_scene_root())
+				mag_sphere.mesh = SphereMesh.new()
+				mag_sphere.mesh.radius = child_static_body.get_node('MeshInstance').mesh.scalar_field[index_to_plot]/10
+				mag_sphere.mesh.height = child_static_body.get_node('MeshInstance').mesh.scalar_field[index_to_plot]/10 * 2
+				mag_sphere.global_transform.origin = Vector3(i,j,k)
+				
+				print('currently at iteration ',cur_iter,',',total_iterations)
+	print(child_static_body.get_node('MeshInstance').mesh.scalar_field)
+#	print("Function not implemented yet")
+	
+
 
 func _on_button_pressed():
 	# Ignore the signal if the property is currently being updated.
@@ -285,7 +355,8 @@ func _on_button_pressed():
 		test_raycast()
 	elif selected_option == get_edited_object().FUNC_OPTIONS.GENERATE_CHILDREN_CONCAVE:
 		generate_children()
-
+	elif selected_option == get_edited_object().FUNC_OPTIONS.CHECK_MAGNITUDE:
+		check_magnitude()
 	property_control.text = "Run"
 
 	 #TODO make dependent on mesh starting location

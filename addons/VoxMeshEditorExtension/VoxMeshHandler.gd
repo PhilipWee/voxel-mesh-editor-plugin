@@ -9,11 +9,14 @@ export(int) var chunk_size = 16
 
 export(ShaderMaterial) var voxel_mesh_material
 
-enum FUNC_OPTIONS {GENERATE_CHILDREN,TEST_RAYCAST,GENERATE_CHILDREN_CONCAVE}
+enum FUNC_OPTIONS {GENERATE_CHILDREN,TEST_RAYCAST,GENERATE_CHILDREN_CONCAVE,CHECK_MAGNITUDE}
 export (FUNC_OPTIONS) var func_option
 
 export(Vector3) var test_ray_from
 export(Vector3) var test_ray_to
+export(String) var mag_check_child_node_name
+export(Vector3) var mag_check_location
+
 # Declare member variables here. Examples:
 # var a = 2
 # var b = "text"
