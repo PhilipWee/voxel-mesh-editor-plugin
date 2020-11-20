@@ -348,21 +348,32 @@ func _on_button_pressed():
 	
 	var selected_option = get_edited_object().func_option
 	
-	
 	if selected_option == get_edited_object().FUNC_OPTIONS.GENERATE_CHILDREN:
+		print("Note that mesh is generated from collisions on layer 20")
+		print("Note that crash may occur if you use more than one collision shape")
 		generate_children()
+		print("Children Generated!")
 	elif selected_option == get_edited_object().FUNC_OPTIONS.TEST_RAYCAST:
 		test_raycast()
 	elif selected_option == get_edited_object().FUNC_OPTIONS.GENERATE_CHILDREN_CONCAVE:
+		print("Note that mesh is generated from collisions on layer 20")
+		print("Note that crash may occur if you use more than one collision shape")
 		generate_children()
+		print("Children Generated!")
 	elif selected_option == get_edited_object().FUNC_OPTIONS.CHECK_MAGNITUDE:
 		check_magnitude()
+	elif selected_option == get_edited_object().FUNC_OPTIONS.CHANGE_VAL_AT_POINT:
+		var coord = get_edited_object().point_to_change_val
+		var new_val = get_edited_object().new_point_val
+		get_edited_object().change_val_at_point(coord,new_val)
+		print('done')
+	elif selected_option == get_edited_object().FUNC_OPTIONS.GET_VAL_AT_POINT:
+		var coord = get_edited_object().point_to_change_val
+		print("val is:",get_edited_object().get_val_at_point(coord))
 	property_control.text = "Run"
 
 	 #TODO make dependent on mesh starting location
-	print("Note that mesh is generated from collisions on layer 20")
-	print("Note that crash may occur if you use more than one collision shape")
-	print("Children Generated!")
+	
 	emit_changed(get_edited_property(), current_value)
 
 
